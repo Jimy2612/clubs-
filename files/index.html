@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BetiMaster - Bet & Win Big</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- MODALS -->
+<div id="loginModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-logo">BET<span>MASTER</span></div>
+    <h2>Welcome Back</h2>
+    <p class="modal-sub">Login to your account</p>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="loginPhone" placeholder="07XXXXXXXX" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>PIN</label>
+      <input type="password" id="loginPin" placeholder="Enter 4-digit PIN" maxlength="4" class="form-input">
+    </div>
+    <button class="btn-primary full-width" onclick="handleLogin()">LOGIN</button>
+    <p class="modal-link">Don't have an account? <a onclick="switchModal('loginModal','registerModal')">Register</a></p>
+    <p class="modal-link"><a onclick="switchModal('loginModal','forgotModal')">Forgot PIN?</a></p>
+  </div>
+</div>
+
+<div id="registerModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('registerModal')">✕</button>
+    <div class="modal-logo">BET<span>MASTER</span></div>
+    <h2>Create Account</h2>
+    <p class="modal-sub">Join thousands of winners</p>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="regName" placeholder="John Doe" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="regPhone" placeholder="07XXXXXXXX" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>Create PIN</label>
+      <input type="password" id="regPin" placeholder="4-digit PIN" maxlength="4" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>Confirm PIN</label>
+      <input type="password" id="regPinConfirm" placeholder="Confirm PIN" maxlength="4" class="form-input">
+    </div>
+    <div class="form-group checkbox-group">
+      <input type="checkbox" id="termsCheck"> 
+      <label for="termsCheck">I agree to the <a href="#">Terms & Conditions</a> and am 18+</label>
+    </div>
+    <button class="btn-primary full-width" onclick="handleRegister()">CREATE ACCOUNT</button>
+    <p class="modal-link">Already have an account? <a onclick="switchModal('registerModal','loginModal')">Login</a></p>
+  </div>
+</div>
+
+<div id="forgotModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('forgotModal')">✕</button>
+    <h2>Reset PIN</h2>
+    <p class="modal-sub">Enter your phone number to reset</p>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="resetPhone" placeholder="07XXXXXXXX" class="form-input">
+    </div>
+    <button class="btn-primary full-width" onclick="handleReset()">SEND RESET CODE</button>
+    <p class="modal-link"><a onclick="switchModal('forgotModal','loginModal')">Back to Login</a></p>
+  </div>
+</div>
+
+<div id="depositModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('depositModal')">✕</button>
+    <h2>💰 Deposit Funds</h2>
+    <p class="modal-sub">M-PESA · Airtel Money · Bank</p>
+    <div class="payment-methods">
+      <div class="pay-method active" onclick="selectPayMethod(this,'mpesa')">
+        <span>📱</span> M-PESA
+      </div>
+      <div class="pay-method" onclick="selectPayMethod(this,'airtel')">
+        <span>📡</span> Airtel
+      </div>
+      <div class="pay-method" onclick="selectPayMethod(this,'bank')">
+        <span>🏦</span> Bank
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Amount (KES)</label>
+      <input type="number" id="depositAmount" placeholder="Min: 10 KES" min="10" class="form-input">
+    </div>
+    <div class="quick-amounts">
+      <button onclick="setAmount(50)">50</button>
+      <button onclick="setAmount(100)">100</button>
+      <button onclick="setAmount(500)">500</button>
+      <button onclick="setAmount(1000)">1,000</button>
+    </div>
+    <div class="form-group">
+      <label>Phone Number</label>
+      <input type="tel" id="depositPhone" placeholder="07XXXXXXXX" class="form-input">
+    </div>
+    <button class="btn-primary full-width" onclick="handleDeposit()">DEPOSIT NOW</button>
+  </div>
+</div>
+
+<div id="withdrawModal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal('withdrawModal')">✕</button>
+    <h2>💸 Withdraw Funds</h2>
+    <p class="modal-sub">Available: KES <span id="withdrawBalance">0.00</span></p>
+    <div class="form-group">
+      <label>Amount (KES)</label>
+      <input type="number" id="withdrawAmount" placeholder="Min: 100 KES" min="100" class="form-input">
+    </div>
+    <div class="form-group">
+      <label>M-PESA Number</label>
+      <input type="tel" id="withdrawPhone" placeholder="07XXXXXXXX" class="form-input">
+    </div>
+    <button class="btn-primary full-width" onclick="handleWithdraw()">WITHDRAW</button>
+  </div>
+</div>
+
+<div id="betslipModal" class="modal-overlay hidden">
+  <div class="modal-box betslip-modal">
+    <button class="modal-close" onclick="closeModal('betslipModal')">✕</button>
+    <h2>🎫 Bet Slip</h2>
+    <div id="betslipContent"></div>
+    <div class="betslip-total" id="betslipTotal"></div>
+    <div class="form-group">
+      <label>Stake (KES)</label>
+      <input type="number" id="stakeAmount" placeholder="Enter stake" min="10" class="form-input" oninput="calcPotential()">
+    </div>
+    <div class="potential-win" id="potentialWin">Potential Win: KES 0.00</div>
+    <button class="btn-primary full-width" onclick="placeBet()">PLACE BET</button>
+  </div>
+</div>
+
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-top">
+    <div class="logo" onclick="navigateTo('home')">BET<span>MASTER</span></div>
+    <nav class="header-nav desktop-only">
+      <a onclick="navigateTo('home')" class="nav-link active">🏠 Home</a>
+      <a onclick="navigateTo('live')" class="nav-link">🔴 Live</a>
+      <a onclick="navigateTo('sports')" class="nav-link">⚽ Sports</a>
+      <a onclick="navigateTo('casino')" class="nav-link">🎰 Casino</a>
+      <a onclick="navigateTo('virtual')" class="nav-link">🎮 Virtual</a>
+      <a onclick="navigateTo('jackpot')" class="nav-link">💎 Jackpot</a>
+    </nav>
+    <div class="header-actions">
+      <div id="guestActions" class="guest-actions">
+        <button class="btn-outline" onclick="openModal('loginModal')">LOGIN</button>
+        <button class="btn-primary" onclick="openModal('registerModal')">REGISTER</button>
+      </div>
+      <div id="userActions" class="user-actions hidden">
+        <div class="balance-chip" onclick="openModal('depositModal')">
+          <span>KES</span> <strong id="headerBalance">0.00</strong>
+          <span class="dep-btn">+</span>
+        </div>
+        <div class="user-menu" onclick="toggleUserMenu()">
+          <div class="avatar" id="userAvatar">U</div>
+          <div id="userDropdown" class="user-dropdown hidden">
+            <a onclick="navigateTo('profile')">👤 My Account</a>
+            <a onclick="navigateTo('mybets')">🎫 My Bets</a>
+            <a onclick="openModal('depositModal')">💰 Deposit</a>
+            <a onclick="openModal('withdrawModal')">💸 Withdraw</a>
+            <a onclick="navigateTo('transactions')">📋 Transactions</a>
+            <a onclick="navigateTo('responsible')">🛡 Responsible Gaming</a>
+            <hr>
+            <a onclick="handleLogout()" class="logout-link">🚪 Logout</a>
+          </div>
+        </div>
+      </div>
+      <div class="betslip-btn" onclick="openModal('betslipModal')">
+        🎫 <span id="betslipCount" class="betslip-count">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sport Tabs -->
+  <div class="sport-tabs" id="sportTabsBar">
+    <div class="sport-tab active" onclick="filterSport('all')">🌍 All</div>
+    <div class="sport-tab" onclick="filterSport('football')">⚽ Football</div>
+    <div class="sport-tab" onclick="filterSport('basketball')">🏀 Basketball</div>
+    <div class="sport-tab" onclick="filterSport('tennis')">🎾 Tennis</div>
+    <div class="sport-tab" onclick="filterSport('rugby')">🏉 Rugby</div>
+    <div class="sport-tab" onclick="filterSport('cricket')">🏏 Cricket</div>
+    <div class="sport-tab" onclick="filterSport('volleyball')">🏐 Volleyball</div>
+    <div class="sport-tab" onclick="filterSport('boxing')">🥊 Boxing</div>
+    <div class="sport-tab" onclick="filterSport('esports')">🎮 Esports</div>
+    <div class="sport-tab" onclick="filterSport('hockey')">🏒 Hockey</div>
+  </div>
+</header>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <a onclick="navigateTo('home')" class="mob-nav active">🏠<span>Home</span></a>
+  <a onclick="navigateTo('live')" class="mob-nav">🔴<span>Live</span></a>
+  <a onclick="navigateTo('sports')" class="mob-nav">⚽<span>Sports</span></a>
+  <a onclick="navigateTo('casino')" class="mob-nav">🎰<span>Casino</span></a>
+  <a onclick="openModal('betslipModal')" class="mob-nav">🎫<span>Slip</span></a>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- HOME PAGE -->
+  <div id="page-home" class="page active">
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-slides" id="heroSlides">
+        <div class="hero-slide slide1">
+          <div class="slide-content">
+            <div class="slide-badge">🔥 HOT OFFER</div>
+            <h1>BET & WIN UP TO<br><span>KES 1,000,000</span></h1>
+            <p>Jackpot every week. Don't miss out!</p>
+            <button class="btn-accent" onclick="navigateTo('jackpot')">PLAY JACKPOT</button>
+          </div>
+        </div>
+        <div class="hero-slide slide2">
+          <div class="slide-content">
+            <div class="slide-badge">🎁 WELCOME BONUS</div>
+            <h1>GET <span>100%</span> BONUS<br>ON FIRST DEPOSIT</h1>
+            <p>Register today and double your money</p>
+            <button class="btn-accent" onclick="openModal('registerModal')">CLAIM BONUS</button>
+          </div>
+        </div>
+        <div class="hero-slide slide3">
+          <div class="slide-content">
+            <div class="slide-badge">🔴 LIVE NOW</div>
+            <h1>BET LIVE ON<br><span>100+ EVENTS</span></h1>
+            <p>Real-time odds updated every second</p>
+            <button class="btn-accent" onclick="navigateTo('live')">BET LIVE</button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-dots">
+        <span class="dot active" onclick="goToSlide(0)"></span>
+        <span class="dot" onclick="goToSlide(1)"></span>
+        <span class="dot" onclick="goToSlide(2)"></span>
+      </div>
+    </div>
+
+    <!-- Promo Banners -->
+    <div class="promo-strip">
+      <div class="promo-card promo-jackpot" onclick="navigateTo('jackpot')">
+        <div class="promo-icon">💎</div>
+        <div>
+          <strong>MEGA JACKPOT</strong>
+          <span>KES 50,000,000</span>
+        </div>
+      </div>
+      <div class="promo-card promo-bonus" onclick="openModal('depositModal')">
+        <div class="promo-icon">🎁</div>
+        <div>
+          <strong>DEPOSIT BONUS</strong>
+          <span>100% Up To 5,000</span>
+        </div>
+      </div>
+      <div class="promo-card promo-cashback" onclick="navigateTo('promotions')">
+        <div class="promo-icon">💵</div>
+        <div>
+          <strong>CASHBACK</strong>
+          <span>10% Every Monday</span>
+        </div>
+      </div>
+      <div class="promo-card promo-refer" onclick="navigateTo('refer')">
+        <div class="promo-icon">👥</div>
+        <div>
+          <strong>REFER & EARN</strong>
+          <span>KES 200 Per Friend</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Score Ticker -->
+    <div class="live-ticker" id="liveTicker">
+      <div class="ticker-label">🔴 LIVE</div>
+      <div class="ticker-track" id="tickerTrack"></div>
+    </div>
+
+    <!-- Featured Matches -->
+    <div class="section-header">
+      <h2>⭐ Featured Matches</h2>
+      <a onclick="navigateTo('sports')" class="see-all">See All →</a>
+    </div>
+    <div class="matches-grid" id="featuredMatches"></div>
+
+    <!-- Top Leagues -->
+    <div class="section-header">
+      <h2>🏆 Top Leagues</h2>
+    </div>
+    <div class="leagues-list" id="leaguesList"></div>
+
+    <!-- More Matches -->
+    <div class="section-header">
+      <h2>📅 Today's Matches</h2>
+      <div class="match-filters">
+        <button class="filter-btn active" onclick="filterMatches('all',this)">All</button>
+        <button class="filter-btn" onclick="filterMatches('prematch',this)">Pre-Match</button>
+        <button class="filter-btn" onclick="filterMatches('live',this)">Live</button>
+      </div>
+    </div>
+    <div id="matchesList" class="matches-list"></div>
+  </div>
+
+  <!-- LIVE PAGE -->
+  <div id="page-live" class="page">
+    <div class="page-hero live-hero">
+      <h1>🔴 Live Betting</h1>
+      <p>Bet on events happening right now</p>
+    </div>
+    <div class="live-stats-bar">
+      <div class="live-stat"><strong id="liveCount">0</strong><span>Live Events</span></div>
+      <div class="live-stat"><strong>⚽</strong><span>Football</span></div>
+      <div class="live-stat"><strong>🏀</strong><span>Basketball</span></div>
+      <div class="live-stat"><strong>🎾</strong><span>Tennis</span></div>
+    </div>
+    <div id="liveMatches" class="matches-list"></div>
+  </div>
+
+  <!-- SPORTS PAGE -->
+  <div id="page-sports" class="page">
+    <div class="page-hero sports-hero">
+      <h1>⚽ Sports Betting</h1>
+      <p>Thousands of events, best odds guaranteed</p>
+    </div>
+    <div id="sportsMatches" class="matches-list"></div>
+  </div>
+
+  <!-- CASINO PAGE -->
+  <div id="page-casino" class="page">
+    <div class="page-hero casino-hero">
+      <h1>🎰 Casino</h1>
+      <p>Slots, Table Games & Live Casino</p>
+    </div>
+    <div class="casino-categories">
+      <button class="casino-cat active" onclick="filterCasino('all',this)">All Games</button>
+      <button class="casino-cat" onclick="filterCasino('slots',this)">🎰 Slots</button>
+      <button class="casino-cat" onclick="filterCasino('table',this)">🃏 Table</button>
+      <button class="casino-cat" onclick="filterCasino('live',this)">📺 Live</button>
+      <button class="casino-cat" onclick="filterCasino('crash',this)">🚀 Crash</button>
+    </div>
+    <div class="casino-grid" id="casinoGrid"></div>
+  </div>
+
+  <!-- VIRTUAL PAGE -->
+  <div id="page-virtual" class="page">
+    <div class="page-hero virtual-hero">
+      <h1>🎮 Virtual Sports</h1>
+      <p>Fast-paced virtual games 24/7</p>
+    </div>
+    <div class="virtual-grid" id="virtualGrid"></div>
+  </div>
+
+  <!-- JACKPOT PAGE -->
+  <div id="page-jackpot" class="page">
+    <div class="jackpot-hero">
+      <div class="jp-label">MEGA JACKPOT</div>
+      <div class="jp-amount" id="jpCounter">KES 50,000,000</div>
+      <div class="jp-subtitle">Pick 17 correct scores to win!</div>
+      <div class="jp-timer">Next Draw: <span id="jpTimer">23:45:12</span></div>
+    </div>
+    <div id="jackpotMatches" class="jackpot-matches"></div>
+    <div class="jp-slip-area" id="jpSlipArea" style="display:none">
+      <button class="btn-primary full-width" onclick="submitJackpot()">SUBMIT JACKPOT</button>
+    </div>
+  </div>
+
+  <!-- MY BETS PAGE -->
+  <div id="page-mybets" class="page">
+    <div class="page-hero">
+      <h1>🎫 My Bets</h1>
+    </div>
+    <div class="bets-tabs">
+      <button class="bet-tab active" onclick="filterBets('all',this)">All</button>
+      <button class="bet-tab" onclick="filterBets('pending',this)">Pending</button>
+      <button class="bet-tab" onclick="filterBets('won',this)">Won</button>
+      <button class="bet-tab" onclick="filterBets('lost',this)">Lost</button>
+    </div>
+    <div id="myBetsList" class="bets-list"></div>
+  </div>
+
+  <!-- PROFILE PAGE -->
+  <div id="page-profile" class="page">
+    <div class="profile-hero">
+      <div class="profile-avatar" id="profileAvatar">U</div>
+      <div class="profile-info">
+        <h2 id="profileName">User</h2>
+        <p id="profilePhone">07XXXXXXXX</p>
+      </div>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-card">
+        <strong id="statBets">0</strong>
+        <span>Total Bets</span>
+      </div>
+      <div class="stat-card">
+        <strong id="statWon">0</strong>
+        <span>Won</span>
+      </div>
+      <div class="stat-card">
+        <strong id="statEarned">0</strong>
+        <span>KES Earned</span>
+      </div>
+    </div>
+    <div class="profile-menu">
+      <a class="profile-item" onclick="openModal('depositModal')">💰 Deposit</a>
+      <a class="profile-item" onclick="openModal('withdrawModal')">💸 Withdraw</a>
+      <a class="profile-item" onclick="navigateTo('mybets')">🎫 My Bets</a>
+      <a class="profile-item" onclick="navigateTo('transactions')">📋 Transactions</a>
+      <a class="profile-item" onclick="navigateTo('responsible')">🛡 Responsible Gaming</a>
+      <a class="profile-item" onclick="navigateTo('support')">💬 Support</a>
+      <a class="profile-item logout-link" onclick="handleLogout()">🚪 Logout</a>
+    </div>
+  </div>
+
+  <!-- TRANSACTIONS PAGE -->
+  <div id="page-transactions" class="page">
+    <div class="page-hero">
+      <h1>📋 Transactions</h1>
+    </div>
+    <div id="transactionsList" class="transactions-list"></div>
+  </div>
+
+  <!-- RESPONSIBLE GAMING PAGE -->
+  <div id="page-responsible" class="page">
+    <div class="page-hero">
+      <h1>🛡 Responsible Gaming</h1>
+    </div>
+    <div class="responsible-content">
+      <div class="rg-card">
+        <h3>🚫 Self Exclusion</h3>
+        <p>Take a break from betting</p>
+        <select id="exclusionPeriod" class="form-input">
+          <option value="1">1 Day</option>
+          <option value="7">1 Week</option>
+          <option value="30">1 Month</option>
+          <option value="365">1 Year</option>
+        </select>
+        <button class="btn-primary" onclick="selfExclude()">APPLY LIMIT</button>
+      </div>
+      <div class="rg-card">
+        <h3>💰 Deposit Limit</h3>
+        <p>Set your daily deposit limit</p>
+        <input type="number" id="depositLimit" placeholder="Max daily deposit (KES)" class="form-input">
+        <button class="btn-primary" onclick="setDepositLimit()">SET LIMIT</button>
+      </div>
+      <div class="rg-card">
+        <h3>🆘 Need Help?</h3>
+        <p>Gambling addiction helpline</p>
+        <a href="tel:+254800723253" class="btn-outline full-width">📞 0800 723 253</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORT PAGE -->
+  <div id="page-support" class="page">
+    <div class="page-hero">
+      <h1>💬 Support</h1>
+    </div>
+    <div class="support-options">
+      <a href="tel:+254700000000" class="support-card">📞 Call Us</a>
+      <a href="https://wa.me/254700000000" class="support-card">💬 WhatsApp</a>
+      <a href="mailto:support@betmaster.co.ke" class="support-card">📧 Email</a>
+      <a href="#" class="support-card" onclick="openLiveChat()">🤖 Live Chat</a>
+    </div>
+    <div class="faq-section">
+      <h3>❓ Frequently Asked Questions</h3>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I deposit?</div>
+        <div class="faq-a">Go to your account, click Deposit, choose M-PESA, enter amount and your phone number. You'll receive an STK push on your phone.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How long do withdrawals take?</div>
+        <div class="faq-a">Withdrawals are processed instantly to M-PESA. Bank transfers take 1-3 business days.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">What is the minimum bet?</div>
+        <div class="faq-a">The minimum bet is KES 10. Maximum single bet is KES 500,000.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">How do I check my bet status?</div>
+        <div class="faq-a">Go to My Bets section in your account to see all pending, won, and lost bets.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROMOTIONS PAGE -->
+  <div id="page-promotions" class="page">
+    <div class="page-hero">
+      <h1>🎁 Promotions</h1>
+    </div>
+    <div class="promos-grid" id="promosGrid"></div>
+  </div>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>

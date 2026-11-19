@@ -1,4 +1,4 @@
-/* ===== BETMASTER APP.JS ===== */
+// betty bet
 'use strict';
 
 // ===== STATE =====
